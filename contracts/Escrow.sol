@@ -28,10 +28,17 @@ contract Escrow {
         
     }
 
-    mapping (uint256 => bool) public isListed;
-    mapping (uint256 => uint256) public purchasePrice;
-    mapping (uint256 => uint256) public escrowAmount;
-    mapping (uint256 => address) public buyer;
+    modifier  onlyInspector() {
+        require(msg.sender == inspector, "Only inspector can call this method");
+        _;
+        
+    }
+
+    mapping(uint256 => bool) public isListed;
+    mapping(uint256 => uint256) public purchasePrice;
+    mapping(uint256 => uint256) public escrowAmount;
+    mapping(uint256 => address) public buyer;
+    mapping(uint256 => bool) public inspectionPassed;
 
     constructor(
         address _nftAddress,
@@ -67,11 +74,19 @@ contract Escrow {
         require(msg.value >= escrowAmount[_nftID]);
     }
 
+    //Update Inspection Status (only inspector)
+    function updateInspectionStatus(uint256 _nftID, bool _passed)
+    public
+    onlyInspector
+    {
+        inspectionPassed[_nftID] = _passed;
+    }
+
     receive() external payable {}
 
     function getBalance() public view returns (uint256) {
         return address(this).balance;
     }
-   
+
 
 }
