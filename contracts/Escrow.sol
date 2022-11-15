@@ -90,12 +90,6 @@ contract Escrow {
         approval[_nftID][msg.sender] = true;
     }
 
-    receive() external payable {}
-
-    function getBalance() public view returns (uint256) {
-        return address(this).balance;
-    }
-    
     //finalise sale
     // Require inspection status(add more items here like appraisal)
     //Require sale to be authorized
@@ -110,9 +104,32 @@ contract Escrow {
         //To make sure its fully funded 
         require(address(this).balance >= purchasePrice[_nftID]);
 
+        isListed[_nftID] = false;
+
+        //To transfer NFT to buyer
+        (bool success, ) = payable(seller).call{value: address(this).balance}("");
+        require(success);
+
+         //Transfer NFT from seller to this contract 
+         IERC721(nftAddress).transferFrom(address(this), buyer[_nftID], _nftID);
+
     }
 
+    //Cancel Sale (handle earnest deposit)
+    // if inspection status is not approved, then refund, otherwise send to seller
 
+    function cancelSale(uint256 _nftID) public {
+        if(inspectionPassed[_nftID] == false) {
+            payable(buyer[_nftID]).transfer(address(this).balance);
+        } else {
+            payable(seller).transfer(address(this).balance);
+        }
+    }
 
+    receive() external payable {}
 
+    function getBalance() public view returns (uint256) {
+        return address(this).balance;
+    }
+    
 }
