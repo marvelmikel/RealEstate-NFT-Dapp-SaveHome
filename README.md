@@ -1,4 +1,5 @@
 # Real Estate NFT DApp
+SaveHome is a realestate NFT Dapp where seller list property also buyer deposits earnset, Appraisal, inspection then lender approves property Ownership would be transfer and then seller gets paid
 
 ## Technology Stack & Tools
 
